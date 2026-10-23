@@ -7,7 +7,8 @@ a janela em editor e visualização.
 - Modo edição sob demanda: editor à esquerda, visualização ao vivo à direita; salva com ⌘S, pelo botão Salvar ou ao fechar o editor
 - App nativo em SwiftUI, com uma janela por documento (abas do macOS incluídas)
 - Renderização com [swift-markdown](https://github.com/swiftlang/swift-markdown) (CommonMark + GFM: tabelas, tachado, listas de tarefas)
-- Tema claro e escuro acompanhando o sistema
+- Botão de tema da visualização: Automático (segue o sistema), Claro, Escuro ou Papel (fundo amarelado)
+- Botão para copiar o Markdown para a área de transferência (⇧⌘C)
 - Imagens e links relativos ao arquivo funcionam; links para outros `.md` abrem no próprio app
 - Funciona offline: nada é carregado da internet para renderizar
 

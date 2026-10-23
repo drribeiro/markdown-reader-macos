@@ -6,11 +6,11 @@ enum HTMLRenderer {
         HTMLFormatter.format(markdown)
     }
 
-    static func page(for markdown: String, title: String) -> String {
+    static func page(for markdown: String, title: String, theme: Theme) -> String {
         let body = body(for: markdown)
         return """
         <!doctype html>
-        <html lang="pt-BR">
+        <html lang="pt-BR" data-theme="\(theme.rawValue)">
         <head>
         <meta charset="utf-8">
         <title>\(escape(title))</title>
@@ -34,10 +34,21 @@ enum HTMLRenderer {
       --border: #d1d9e0; --code-bg: #f6f8fa; --link: #0969da;
     }
     @media (prefers-color-scheme: dark) {
-      :root {
+      :root[data-theme="auto"] {
         --fg: #e6edf3; --muted: #9198a1; --bg: #1e1e1e;
         --border: #3d444d; --code-bg: #2a2d31; --link: #4493f8;
       }
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --fg: #e6edf3; --muted: #9198a1; --bg: #1e1e1e;
+      --border: #3d444d; --code-bg: #2a2d31; --link: #4493f8;
+    }
+    :root[data-theme="sepia"] {
+      color-scheme: light;
+      --fg: #4a3b2c; --muted: #7a6652; --bg: #f4ecd8;
+      --border: #dccdaf; --code-bg: #ebe0c6; --link: #9a5512;
     }
     html { background: var(--bg); }
     body {
