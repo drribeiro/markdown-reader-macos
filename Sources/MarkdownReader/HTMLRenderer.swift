@@ -2,8 +2,12 @@ import Foundation
 import Markdown
 
 enum HTMLRenderer {
+    static func body(for markdown: String) -> String {
+        HTMLFormatter.format(markdown)
+    }
+
     static func page(for markdown: String, title: String) -> String {
-        let body = HTMLFormatter.format(markdown)
+        let body = body(for: markdown)
         return """
         <!doctype html>
         <html lang="pt-BR">

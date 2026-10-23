@@ -16,16 +16,40 @@ struct MarkdownView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        guard context.coordinator.renderedText != text else { return }
-        context.coordinator.renderedText = text
-        let title = fileURL?.deletingPathExtension().lastPathComponent ?? "Markdown"
-        // A pasta do arquivo como base faz imagens e links relativos funcionarem.
-        webView.loadHTMLString(HTMLRenderer.page(for: text, title: title),
-                               baseURL: fileURL?.deletingLastPathComponent())
+        let coordinator = context.coordinator
+        coordinator.latestText = text
+        if coordinator.isLoaded {
+            // Página já carregada: troca só o conteúdo, preservando a rolagem enquanto se edita.
+            coordinator.refresh(webView)
+        } else if !coordinator.isLoading {
+            coordinator.isLoading = true
+            coordinator.renderedText = text
+            let title = fileURL?.deletingPathExtension().lastPathComponent ?? "Markdown"
+            // A pasta do arquivo como base faz imagens e links relativos funcionarem.
+            webView.loadHTMLString(HTMLRenderer.page(for: text, title: title),
+                                   baseURL: fileURL?.deletingLastPathComponent())
+        }
     }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
+        var latestText = ""
         var renderedText: String?
+        var isLoading = false
+        var isLoaded = false
+
+        func refresh(_ webView: WKWebView) {
+            guard renderedText != latestText,
+                  let json = try? JSONEncoder().encode(HTMLRenderer.body(for: latestText)),
+                  let literal = String(data: json, encoding: .utf8) else { return }
+            renderedText = latestText
+            webView.evaluateJavaScript("document.querySelector('article').innerHTML = \(literal);")
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            isLoading = false
+            isLoaded = true
+            refresh(webView)  // o texto pode ter mudado durante o carregamento
+        }
 
         func webView(_ webView: WKWebView,
                      decidePolicyFor action: WKNavigationAction,

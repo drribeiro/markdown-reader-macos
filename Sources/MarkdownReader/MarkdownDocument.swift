@@ -5,11 +5,15 @@ extension UTType {
     static let markdown = UTType(importedAs: "net.daringfireball.markdown")
 }
 
-/// Documento somente leitura: o app abre e exibe, nunca grava.
 struct MarkdownDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.markdown, .plainText] }
+    static var writableContentTypes: [UTType] { [.markdown] }
 
     var text: String
+
+    init(text: String = "") {
+        self.text = text
+    }
 
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
