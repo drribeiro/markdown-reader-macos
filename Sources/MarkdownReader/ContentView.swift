@@ -24,6 +24,13 @@ struct ContentView: View {
             }
         }
         .toolbar {
+            if isEditing {
+                // Sem atalho próprio: o ⌘S do menu Arquivo já dispara o mesmo save.
+                Button(action: save) {
+                    Label("Salvar", systemImage: "square.and.arrow.down")
+                }
+                .help("Salvar (⌘S)")
+            }
             Toggle(isOn: editing.projectedValue) {
                 Label("Editar", systemImage: "square.split.2x1")
             }
@@ -31,5 +38,13 @@ struct ContentView: View {
             .help(isEditing ? "Fechar o editor (⌘E)" : "Editar ao lado da visualização (⌘E)")
         }
         .onAppear { editing.wrappedValue = document.text.isEmpty }  // documento novo já abre editando
+        .onChange(of: isEditing) { _, nowEditing in
+            if !nowEditing { save() }  // fechar o editor salva o que foi alterado
+        }
+    }
+
+    /// Envia `save:` pela cadeia de responders, que chega ao NSDocument da janela ativa.
+    private func save() {
+        NSApp.sendAction(#selector(NSDocument.save(_:)), to: nil, from: nil)
     }
 }
